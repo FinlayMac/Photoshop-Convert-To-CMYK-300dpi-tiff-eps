@@ -9,8 +9,8 @@ Takes a directory of images and changes:
 
 
 <h2>To Run:</h2>
-Download **imageToCMYK300dpiPS.js** and save anywhere<br>
-File > Scripts > Browse > Locate the **imageToCMYK300dpiPS.js** file<br>
+Download imageToCMYK300dpiPS.js and save anywhere<br>
+File > Scripts > Browse > Locate the imageToCMYK300dpiPS.js file<br>
 
 <br>
 
