@@ -5,12 +5,17 @@ if (app.documents.length == 0) {
 }
 
 var folderAddress;
+var eps;
 
 function Main() {
 
-    alert("Please select an image from the folder you wish to convert to CMYK + .tiff");
+    alert("Please select an image from the folder you wish to convert.\n\nFiles will be outputted as: \nCMYK, 300dpi, .tiff");
     //asks the user to select an image
     var selectedImage = openDialog();
+
+    //if user doesnt select an image
+    if (selectedImage == "") { alert("No image selected, script stopped"); return; }
+    
     //takes the select image and makes it the active document
     app.open(selectedImage[0]);
 
@@ -25,9 +30,19 @@ function Main() {
 
     if (shouldContinue == false) return;
 
-    var folder1 = Folder(folderAddress + "/CMYK");
+
+
+
+    var CYMKfolder = Folder(folderAddress + "/CMYK");
     //Check if it exist, if not create it.
-    if (!folder1.exists) folder1.create();
+    if (!CYMKfolder.exists) CYMKfolder.create();
+
+    eps = confirm("Do you want .eps files as well as .tiff?");
+    if (eps) {
+        var EPSfolder = Folder(folderAddress + "/EPS");
+        //Check if it exist, if not create it.
+        if (!EPSfolder.exists) EPSfolder.create();
+    }
 
     //for each loaded image
     for (var i = 0; i < files.length; i++) {
@@ -63,18 +78,31 @@ function PrepSingleImage(FileAddress) {
     curLayer.duplicate(copy, ElementPlacement.PLACEATEND)
     activeDocument = copy;
 
+    //resizes the document to 300dpi
+    app.activeDocument.resizeImage(undefined, undefined, 300, ResampleMethod.NONE);
+   
     SaveTiff(filename, folderAddress);
+    if (eps) { SaveEPS(filename, folderAddress); }
+    
+    app.activeDocument.close(SaveOptions.DONOTSAVECHANGES)
+    app.activeDocument.close(SaveOptions.DONOTSAVECHANGES)
 }
 
 /*saves the current active document as a tiff when given a name and location*/
 function SaveTiff(fileName, saveFolder) {
     var file = new File(saveFolder + '/CMYK/' + fileName + '.tiff');
     var opts = new TiffSaveOptions();
-    //tiffSaveOptions.embedColorProfile = true;
     opts.imageCompression = TIFFEncoding.TIFFLZW;
     opts.layers = false;
-    //opts.layerCompression = true;
     app.activeDocument.saveAs(file, opts, true);
-    app.activeDocument.close(SaveOptions.DONOTSAVECHANGES)
-    app.activeDocument.close(SaveOptions.DONOTSAVECHANGES)
+}
+
+
+/*saves the current active document as a EPS when given a name and location*/
+function SaveEPS(fileName, saveFolder) {
+    var file = new File(saveFolder + '/EPS/' + fileName + '.eps');
+    var opts = new EPSSaveOptions();
+    opts.halftoneScreen = true;
+    opts.encoding = SaveEncoding.ASCII
+    app.activeDocument.saveAs(file, opts, true);
 }
